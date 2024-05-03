@@ -9,6 +9,8 @@ class SGD(Optimizer):
 
     def step(self):
         "TODO: implement SGD algorithm"
+        print(f'{self.layers}')
+
         for layer in self.layers:
             if layer.weight is not None and layer.weight.requires_grad:
                 layer.weight.data = layer.weight.data.__sub__(self.learning_rate.__mul__(layer.weight.grad.data))

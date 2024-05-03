@@ -18,6 +18,11 @@ class SGD(Optimizer):
             # print("########################## layerrrrrrrrrrrrrrrrrr ###########################")
             # print(f'self.learning rate:{self.learning_rate}')
             if layer.weight is not None and layer.weight.requires_grad:
-                layer.weight.data = layer.weight.data.__sub__(layer.weight.grad.__mul__(Tensor([self.learning_rate])))
+                # print(f'layer.weight.data: {layer.weight.data}')
+                # print(f'layer.weight.grad.__mul__(Tensor([self.learning_rate])): {layer.weight.grad.__mul__(Tensor([self.learning_rate]))}')
+                layer.weight = layer.weight.__sub__(layer.weight.grad.__mul__(Tensor([self.learning_rate])))
+                # print(f'after update layer.weight.data: {layer.weight.data}')
+
             if layer.need_bias and layer.bias is not None and layer.bias.requires_grad:
-                layer.bias.data = layer.bias.data.__sub__(layer.bias.grad.__mul__(Tensor([self.learning_rate])))
+                # print("in bias")
+                layer.bias = layer.bias.__sub__(layer.bias.grad.__mul__(Tensor([self.learning_rate])))

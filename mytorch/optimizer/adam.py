@@ -17,7 +17,7 @@ class Adam(Optimizer):
     def step(self):
         self.timestep += 1
         for layer in self.layers:
-            for param_name, param in layer.parameters.items():
+            for param_name, param in layer.parameters().items():
                 if param_name not in self.momentums:
                     self.momentums[param_name] = np.zeros_like(param.data)
                     self.velocities[param_name] = np.zeros_like(param.data)

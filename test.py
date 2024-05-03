@@ -244,18 +244,24 @@ base = 10
 
 # print(Tensor(batch_data).data)
 
-def CategoricalCrossEntropy(preds: Tensor, label: Tensor):
-    "TODO: implement Categorical Cross Entropy loss"
-    label_array= np.zeros_like(preds.data)
-    label_array[int(label.data)]=1
-    p_start = Tensor(label_array)
-    # result = (preds.log().__mul__(label).sum()).__neg__()
-    result = (preds.log().__mul__(p_start).sum()).__neg__()
-    print(f'result shape: {result.shape}')
-    return result
+# def CategoricalCrossEntropy(preds: Tensor, label: Tensor):
+#     "TODO: implement Categorical Cross Entropy loss"
+#     label_array= np.zeros_like(preds.data)
+#     label_array[int(label.data)]=1
+#     p_start = Tensor(label_array)
+#     # result = (preds.log().__mul__(label).sum()).__neg__()
+#     result = (preds.log().__mul__(p_start).sum()).__neg__()
+#     print(f'result shape: {result.shape}')
+#     return result
 
-pred = Tensor(np.array([0.2,0.7,0.1]))
-label = Tensor(np.array([1]))
-print(pred)
-print(label)
-print(CategoricalCrossEntropy(pred, label))
+# pred = Tensor(np.array([0.2,0.7,0.1]))
+# scaler = Tensor(np.array([2]))
+# print(pred.__mul__(scaler))
+# label = Tensor(np.array([1]))
+# print(pred)
+# print(label)
+# print(CategoricalCrossEntropy(pred, label))
+
+
+Tensor(round(1/self.learning_rate,3))
+

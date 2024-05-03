@@ -9,10 +9,13 @@ class SGD(Optimizer):
 
     def step(self):
         "TODO: implement SGD algorithm"
-        print(f'{self.layers}')
-
+        # for layer in self.layers:
+        #     if layer.weight is not None and layer.weight.requires_grad:
+        #         print(f'layer grad: {layer.weight.grad}')
         for layer in self.layers:
+            print("########################## layerrrrrrrrrrrrrrrrrr ###########################")
             if layer.weight is not None and layer.weight.requires_grad:
-                layer.weight.data = layer.weight.data.__sub__(self.learning_rate.__mul__(layer.weight.grad.data))
+                layer.weight.data = layer.weight.data.__sub__(self.learning_rate * (layer.weight.grad.data))
+            print("now go bias........................")
             if layer.need_bias and layer.bias is not None and layer.bias.requires_grad:
-                layer.bias.data = layer.bias.data.__sub__(self.learning_rate.__mul__(layer.bias.grad.data))
+                layer.bias.data = layer.bias.data.__sub__(self.learning_rate * (layer.bias.grad.data))

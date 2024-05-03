@@ -1,3 +1,6 @@
+from ast import List
+
+from torch import tensor
 from mytorch import Tensor
 import numpy as np
 
@@ -60,9 +63,9 @@ class AvgPool2d:
 from mytorch import Tensor
 import numpy as np
 
-def zero_padding(x: Tensor, padding_size=(1,1)):
-    x.data = np.pad(x.data, padding_size, mode='constant', constant_values=0)
-    return x
+# def zero_padding(x: Tensor, padding_size=(1,1)):
+    # x.data = np.pad(x.data, padding_size, mode='constant', constant_values=0)
+    # return x
 
 # a= Tensor([[[[1,3,1],[3,1,2]], [[1,3,1],[3,1,2]]], [[[2,2,2],[2,2,2]], [[1,3,1],[3,1,2]]]])
 # print(a.data[0])
@@ -206,7 +209,53 @@ def relu(x: Tensor) -> Tensor:
 
 base = 10
 
-a= Tensor([100,-10], requires_grad=True)
+# a= Tensor([100,-10], requires_grad=True)
+# # print(a.shape)
 
-print(a.data/10)
-# print(np.log(a.data)/np.log(base))
+# # print(a.data/10)
+# # print(np.log(a.data)/np.log(base))
+
+
+
+
+# def zero_padding(x: List, padding_size=(1,1)):
+#     data= np.pad(x, padding_size, mode='constant', constant_values=0)
+#     return data
+
+# a= Tensor([[[[1,3,1],[3,1,2]], [[1,3,1],[3,1,2]]], [[[2,2,2],[2,2,2]], [[1,3,1],[3,1,2]]]])
+# print(a.data)
+# print('################################')
+# # # print(zero_padding(a))
+
+# # # Vectorize the function
+# # do_zero_padding = np.vectorize(zero_padding)
+
+# # # Apply the vectorized function along the rows (axis=1)
+# # result = np.apply_along_axis(do_zero_padding, axis=1, arr=a.data)
+# # print(result)
+
+# batch_data=[]
+
+# for data in a.data:
+#     channel_data = []
+#     for channel in data:
+#         channel_data.append(zero_padding(channel))
+#     batch_data.append(channel_data)
+
+# print(Tensor(batch_data).data)
+
+def CategoricalCrossEntropy(preds: Tensor, label: Tensor):
+    "TODO: implement Categorical Cross Entropy loss"
+    label_array= np.zeros_like(preds.data)
+    label_array[int(label.data)]=1
+    p_start = Tensor(label_array)
+    # result = (preds.log().__mul__(label).sum()).__neg__()
+    result = (preds.log().__mul__(p_start).sum()).__neg__()
+    print(f'result shape: {result.shape}')
+    return result
+
+pred = Tensor(np.array([0.2,0.7,0.1]))
+label = Tensor(np.array([1]))
+print(pred)
+print(label)
+print(CategoricalCrossEntropy(pred, label))

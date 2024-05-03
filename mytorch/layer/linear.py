@@ -31,14 +31,14 @@ class Linear(Layer):
         "TODO: initialize weight by initializer function (mode)"
         self.weight = Tensor(
             data=initializer((self.inputs, self.outputs), mode=self.initialize_mode),
-            requires_grad=True
+            requires_grad=True,            
         )
 
         "TODO: initialize bias by initializer function (zero mode)"
         if self.need_bias:
             self.bias = Tensor(
                 data=initializer((1, self.outputs), mode='zero'),
-                requires_grad=True
+                requires_grad=True,
             )
 
     def zero_grad(self):

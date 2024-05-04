@@ -1,5 +1,7 @@
 from mytorch import Tensor
 from mytorch.layer import Layer
+from mytorch import Tensor, Dependency
+
 
 import numpy as np
 
@@ -10,18 +12,13 @@ class AvgPool2d(Layer):
         self.stride = stride
         self.padding = padding
 
-    def forward(self, x: Tensor) -> Tensor:
-
-        def zero_padding(x, padding_size=(1,1)):
-            data= np.pad(x, padding_size, mode='constant', constant_values=0)
-            return data
-        
+    def forward(self, x: Tensor) -> Tensor:        
         "TODO: implement forward pass"
         batch_size, channel_numbers, H, W = x.shape
         H_out = (H + 2 * self.padding[0] - self.kernel_size[0]) // self.stride[0] + 1
         W_out = (W + 2 * self.padding[1] - self.kernel_size[1]) // self.stride[1] + 1
 
-        if self.padding is not None or self.padding!=(0,0):
+        if self.padding is not None and self.padding!=(0,0):
             batch_data= []
             for data in x.data:
                 channel_data = []
@@ -40,7 +37,24 @@ class AvgPool2d(Layer):
                         output_data[n, c, h, w] = np.mean(data[n, c, h * self.stride[0] + self.padding[0] : h * self.stride[0] + self.padding[0] + self.kernel_size[0],
                                                         w * self.stride[1] + self.padding[1] : w * self.stride[1] + self.padding[1] + self.kernel_size[1]])
         
-        return Tensor(output_data, x.requires_grad, x.depends_on)
+
+        req_grad = x.requires_grad
+
+        if req_grad:
+            def grad_fn(grad: np.ndarray):
+                # use np.where
+                return grad * 1/(self.kernel_size[0]*self.kernel_size[1])
+
+            depends_on = [Dependency(x, grad_fn)]
+        else:
+            depends_on = []
+
+        return Tensor(output_data, req_grad, depends_on)
     
     def __str__(self) -> str:
         return "avg pool 2d - kernel: {}, stride: {}, padding: {}".format(self.kernel_size, self.stride, self.padding)
+
+
+def zero_padding(x, padding_size=(1,1)):
+    data= np.pad(x, padding_size, mode='constant', constant_values=0)
+    return data

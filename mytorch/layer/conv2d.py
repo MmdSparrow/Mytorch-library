@@ -1,6 +1,8 @@
 from mytorch import Tensor
 from mytorch.layer import Layer
 from mytorch.util import initializer
+from mytorch import Tensor, Dependency
+
 
 
 import numpy as np
@@ -23,7 +25,7 @@ class Conv2d(Layer):
         "TODO: implement forward pass"
 
         # padding
-        if self.padding is not None or self.padding!=(0,0):
+        if self.padding is not None and self.padding!=(0,0):
             batch_data= []
             for data in x.data:
                 channel_data = []
@@ -33,6 +35,9 @@ class Conv2d(Layer):
             data= batch_data
         else:
             data= x.data
+
+
+        # conv
 
 
         

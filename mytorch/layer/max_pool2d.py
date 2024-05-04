@@ -16,8 +16,14 @@ class MaxPool2d(Layer):
         H_out = (H + 2 * self.padding[0] - self.kernel_size[0]) // self.stride[0] + 1
         W_out = (W + 2 * self.padding[1] - self.kernel_size[1]) // self.stride[1] + 1
 
-        if self.padding is not None or self.padding!=(0,0):
-            data= np.pad(x.data, self.padding, mode='constant', constant_values=0)
+        if self.padding is not None and self.padding!=(0,0):
+            batch_data= []
+            for data in x.data:
+                channel_data = []
+                for channel in data:
+                    channel_data.append(zero_padding(channel))
+                batch_data.append(channel_data)
+            data= batch_data
         else:
             data= x.data
 
@@ -33,3 +39,7 @@ class MaxPool2d(Layer):
     
     def __str__(self) -> str:
         return "max pool 2d - kernel: {}, stride: {}, padding: {}".format(self.kernel_size, self.stride, self.padding)
+
+def zero_padding(x, padding_size=(1,1)):
+    data= np.pad(x, padding_size, mode='constant', constant_values=0)
+    return data

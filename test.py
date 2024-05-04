@@ -266,22 +266,121 @@ base = 10
 # Tensor(round(1/self.learning_rate,3))
 
 
-def flatten(x) -> Tensor:
+# def flatten(x) -> Tensor:
+#     """
+#     TODO: implement flatten. 
+#     this methods transforms a n dimensional array into a flat array
+#     hint: use numpy flatten
+#     """
+#     print(f'this is x: {x}')
+#     return x.flatten()
+
+
+# a= Tensor([[[1,3,1],[3,1,2]], [[1,3,1],[3,1,2]]])
+# print(a.data)
+
+
+# do_zero_padding = np.vectorize(flatten)
+
+# # Apply the vectorized function along the rows (axis=1)
+# result = np.apply_along_axis(do_zero_padding, axis=0, arr=a.data)
+# print(result)
+
+# Tensor([[-0.04155506 -1.09098493  0.26597207]
+#  [ 0.88602766  0.33213968  0.33549567]
+#  [-0.93638785 -0.3665651   0.06151861]
+#  [ 0.41464566  0.69636617 -0.96624027]
+#  [ 0.01372388 -0.04445313  0.38072196]
+#  [-0.4551334  -0.40155886 -0.92272375]
+#  [ 1.24411352 -1.22645905 -1.19784186]
+#  [-2.2295188  -0.39371019  0.29233979]
+#  [-1.39699156 -1.26996797  1.2679163 ]
+#  [ 1.32229145  1.46435377 -0.1158694 ]], requires_grad=False)
+
+
+
+###################################################################################################
+# inputs= np.array(
+# [[-0.04155506, -1.09098493 , 0.26597207]
+#  ,[ 0.88602766, 0.33213968, 0.33549567]]
+#  )
+
+# weight = np.array(
+# [[ 0.83757601],
+#  [-1.34889435],
+#  [ 0.4034029 ]]
+#  )
+
+# output = np.array(
+# [[4.56671604],
+#  [5.77683151]]
+# )
+
+# preds = inputs @ weight
+
+
+# actual = output
+# loss=((((preds[0] - actual[0])*(preds[0] - actual[0]))+((preds[1] - actual[1])*(preds[1] - actual[1])))/2)
+# print(f'loss: {loss}')
+
+# cost_per_y_round=((((preds[0] - actual[0]))+((preds[1] - actual[1]))))
+# print(cost_per_y_round)
+
+# total_gradient_1 = weight[0][0] * cost_per_y_round
+# total_gradient_2 = weight[1][0] * cost_per_y_round
+# total_gradient_3 = weight[2][0] * cost_per_y_round
+
+
+# total_gradient_1 = total_gradient_1 * 0.01
+# total_gradient_2 = total_gradient_2 * 0.01
+# total_gradient_3 = total_gradient_3 * 0.01
+
+
+# new_w_1 = weight[0][0] - total_gradient_1
+# new_w_2 = weight[1][0] - total_gradient_1
+# new_w_3 = weight[2][0] - total_gradient_1
+# print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11")
+# print(new_w_1)
+# print(new_w_2)
+# print(new_w_3)
+
+
+#########################################################################################################
+# test soft max
+
+def softmax(x: Tensor) -> Tensor:
     """
-    TODO: implement flatten. 
-    this methods transforms a n dimensional array into a flat array
-    hint: use numpy flatten
+    TODO: implement softmax function
+    hint: you can do it using function you've implemented (not directly define grad func)
+    hint: you can't use sum because it has not axis argument so there are 2 ways:
+        1. implement sum by axis
+        2. using matrix mul to do it :) (recommended)
+    hint: a/b = a*(b^-1)
     """
-    print(f'this is x: {x}')
-    return x.flatten()
+    # SM = self.value.reshape((-1,1))
+    # jac = np.diagflat(self.value) - np.dot(SM, SM.T)
+    exp = x.exp()
+    denominator = exp.__matmul__(np.ones((exp.shape[-1], 1)))
+    result = exp.__mul__(denominator.__pow__(-1))
+    return result
+a = Tensor([-1, 0, 3, 5])
+print(softmax(a))
 
 
-a= Tensor([[[1,3,1],[3,1,2]], [[1,3,1],[3,1,2]]])
-print(a.data)
+#########################################################################################################
 
+# def CategoricalCrossEntropy(preds: Tensor, label: Tensor):
+#     "TODO: implement Categorical Cross Entropy loss"
+#     label_array= np.zeros_like(preds.data)
+#     for i in range(preds.shape[0]):
+#         label_array[i][int(label.data[i])]=1
+#     p_start = Tensor(label_array)
+#     # result = (preds.log().__mul__(label).sum()).__neg__()
+#     result = (preds.log().__mul__(p_start).sum()).__neg__()
+#     # print(f'result shape: {result.shape}')
+#     return result
 
-do_zero_padding = np.vectorize(flatten)
+# preds = Tensor([[0.2, 0.7, 0.1],[0.8, 0.1, 0.1],[0.1, 0.1, 0.9]])
+# label = Tensor([1,0,2])
 
-# Apply the vectorized function along the rows (axis=1)
-result = np.apply_along_axis(do_zero_padding, axis=0, arr=a.data)
-print(result)
+# print(CategoricalCrossEntropy(preds, label))

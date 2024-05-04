@@ -6,7 +6,7 @@ from mytorch.util import initializer
 import numpy as np
 
 class Conv2d(Layer):
-    def __init__(self, in_channels, out_channels, kernel_size=(1, 1), stride=(1, 1), padding=(1, 1), need_bias: bool = False, mode="xavier") -> None:
+    def __init__(self, in_channels, out_channels, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0), need_bias: bool = False, mode="xavier") -> None:
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = kernel_size
@@ -34,7 +34,7 @@ class Conv2d(Layer):
         else:
             data= x.data
 
-        
+
         
     
     def initialize(self):

@@ -126,8 +126,8 @@ class Tensor:
     
     def __setitem__(self, idcs, other):
         "TODO: handle tensor item assignment."
-        res_tensor = _tensor_slice(ensure_tensor(other), idcs)
-        self._data = res_tensor._data
+        res_tensor = ensure_tensor(other)
+        self._data[idcs] = res_tensor._data
         self.requires_grad = res_tensor.requires_grad
         self.depends_on = res_tensor.depends_on
 
@@ -218,21 +218,34 @@ def _tensor_pow(t: Tensor, power: float) -> Tensor:
 def _tensor_slice(t: Tensor, idcs) -> Tensor:
     "TODO: tensor slice"
     if t.data.ndim == 0:
-        raise ValueError("ERROR: A 0-dimensional tensor cannot be sliced!")
-    data = t.data[idcs]
-    requires_grad = t.requires_grad
+        raise ValueError("Erorrrrrrrrrrrr...............")
+        # data = t.data
+        # requires_grad = t.requires_grad
 
-    if requires_grad:
-        def grad_fn(grad: np.ndarray) -> np.ndarray:
-            bigger_grad = np.zeros_like(data)
-            bigger_grad[idcs] = grad
-            return bigger_grad
+        # if requires_grad:
+        #     def grad_fn(grad: np.ndarray) -> np.ndarray:
+        #         return grad
 
-        depends_on = Dependency(t, grad_fn)
+        #     depends_on = Dependency(t, grad_fn)
+        # else:
+        #     depends_on = []
+
+        # return Tensor(data, requires_grad, depends_on)
     else:
-        depends_on = []
+        data = t.data[idcs]
+        requires_grad = t.requires_grad
 
-    return Tensor(data, requires_grad, depends_on)
+        if requires_grad:
+            def grad_fn(grad: np.ndarray) -> np.ndarray:
+                bigger_grad = np.zeros_like(data)
+                bigger_grad[idcs] = grad
+                return bigger_grad
+
+            depends_on = Dependency(t, grad_fn)
+        else:
+            depends_on = []
+
+        return Tensor(data, requires_grad, depends_on)
 
 def _tensor_neg(t: Tensor) -> Tensor:
     "TODO: tensor negative"

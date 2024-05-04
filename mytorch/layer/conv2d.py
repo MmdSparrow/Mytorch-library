@@ -23,29 +23,53 @@ class Conv2d(Layer):
 
     def forward(self, x: Tensor) -> Tensor:
         "TODO: implement forward pass"
+        batch_size, _, height, width = x.shape
 
-        # padding
-        if self.padding is not None and self.padding!=(0,0):
-            batch_data= []
-            for data in x.data:
-                channel_data = []
-                for channel in data:
-                    channel_data.append(zero_padding(channel))
-                batch_data.append(channel_data)
-            data= batch_data
-        else:
-            data= x.data
+        out_height = (height + 2 * self.padding[0] - self.kernel_size[0]) // self.stride[0] + 1
+        out_width = (width + 2 * self.padding[1] - self.kernel_size[1]) // self.stride[1] + 1
 
+        # if self.padding is not None and self.padding!=(0,0):
+        #     for batch_index in range(batch_size):
+        #         for channel_index in range(channel_size):
+        #             pass
+
+
+        # # padding
+        # if self.padding is not None and self.padding!=(0,0):
+        #     batch_data= []
+        #     for data in x.data:
+        #         channel_data = []
+        #         for channel in data:
+        #             channel_data.append(zero_padding(channel))
+        #         batch_data.append(channel_data)
+        #     data= batch_data
+        # else:
+        #     data= x.data
+
+        # x.__getitem__(slice(batch_index)).__getitem__(slice(channel_index))
+
+        result = Tensor(np.zeros((batch_size, self.out_channels, out_height, out_width)))
 
         # conv
+        for b in range(batch_size):
+            for o in range(self.out_channels):
+                for i in range(out_height):
+                    for j in range(out_width):
+                        x_start = i * self.stride[0]
+                        x_end = x_start + self.kernel_size[0]
+                        y_start = j * self.stride[1]
+                        y_end = y_start + self.kernel_size[1]
+                        result[b, o, i, j] = (x[b, :, x_start:x_end, y_start:y_end].__mul__(self.weight[o, :, :, :])).sum()
 
+        if self.need_bias:
+            result = result + b
 
-        
+        return result
     
     def initialize(self):
         "TODO: initialize weight by initializer function (mode)"
         self.weight = Tensor(
-            data=initializer((self.kernel_size[0], self.kernel_size[1]), mode=self.initialize_mode),
+            data=initializer((self.out_channels, self.in_channels ,self.kernel_size[0], self.kernel_size[1]), mode=self.initialize_mode),
             requires_grad=True,            
         )
 

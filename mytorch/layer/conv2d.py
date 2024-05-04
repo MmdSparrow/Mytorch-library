@@ -1,5 +1,7 @@
 from mytorch import Tensor
 from mytorch.layer import Layer
+from mytorch.util import initializer
+
 
 import numpy as np
 
@@ -19,19 +21,34 @@ class Conv2d(Layer):
 
     def forward(self, x: Tensor) -> Tensor:
         "TODO: implement forward pass"
-        x.data 
+
+        # padding
+        if self.padding is not None or self.padding!=(0,0):
+            batch_data= []
+            for data in x.data:
+                channel_data = []
+                for channel in data:
+                    channel_data.append(zero_padding(channel))
+                batch_data.append(channel_data)
+            data= batch_data
+        else:
+            data= x.data
+
+        
+        
     
     def initialize(self):
-        "TODO: initialize weights"
+        "TODO: initialize weight by initializer function (mode)"
         self.weight = Tensor(
-            data=initializer(self.inputs * self.outputs, mode=self.initialize_mode),
-            requires_grad=True
+            data=initializer((self.kernel_size[0], self.kernel_size[1]), mode=self.initialize_mode),
+            requires_grad=True,            
         )
 
+        "TODO: initialize bias by initializer function (zero mode)"
         if self.need_bias:
             self.bias = Tensor(
-                data=initializer(self.inputs * self.outputs, mode='zero'),
-                requires_grad=True
+                data=initializer((1, self.outputs), mode='zero'),
+                requires_grad=True,
             )
 
     def zero_grad(self):
@@ -51,3 +68,7 @@ class Conv2d(Layer):
                                                                                     self.kernel_size[0] * self.kernel_size[1],
                                                                                     self.kernel_size,
                                                                                     self.stride, self.padding)
+
+def zero_padding(x, padding_size=(1,1)):
+    data= np.pad(x, padding_size, mode='constant', constant_values=0)
+    return data

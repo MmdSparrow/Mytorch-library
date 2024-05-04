@@ -4,6 +4,8 @@ from torch import tensor
 from mytorch import Tensor
 import numpy as np
 
+from mytorch.tensor import Tensorable
+
 class AvgPool2d:
     def __init__(self, in_channels, out_channels, kernel_size=(1, 1), stride=(1, 1), padding=(1, 1)) -> None:
         super()
@@ -348,23 +350,26 @@ base = 10
 #########################################################################################################
 # test soft max
 
-def softmax(x: Tensor) -> Tensor:
-    """
-    TODO: implement softmax function
-    hint: you can do it using function you've implemented (not directly define grad func)
-    hint: you can't use sum because it has not axis argument so there are 2 ways:
-        1. implement sum by axis
-        2. using matrix mul to do it :) (recommended)
-    hint: a/b = a*(b^-1)
-    """
-    # SM = self.value.reshape((-1,1))
-    # jac = np.diagflat(self.value) - np.dot(SM, SM.T)
-    exp = x.exp()
-    denominator = exp.__matmul__(np.ones((exp.shape[-1], 1)))
-    result = exp.__mul__(denominator.__pow__(-1))
-    return result
-a = Tensor([-1, 0, 3, 5])
-print(softmax(a))
+# def softmax(x: Tensor) -> Tensor:
+#     """
+#     TODO: implement softmax function
+#     hint: you can do it using function you've implemented (not directly define grad func)
+#     hint: you can't use sum because it has not axis argument so there are 2 ways:
+#         1. implement sum by axis
+#         2. using matrix mul to do it :) (recommended)
+#     hint: a/b = a*(b^-1)
+#     """
+#     # SM = self.value.reshape((-1,1))
+#     # jac = np.diagflat(self.value) - np.dot(SM, SM.T)
+#     exp = x.exp()
+#     denominator = exp.__matmul__(np.ones((exp.shape[-1], 1)))
+#     result = exp.__mul__(denominator.__pow__(-1))
+#     return result
+
+# a = Tensor([[-1, 0, 3, 5], [-1, 0, 3, 5]])
+# b = Tensor([[-1, 0, 3, 5]])
+# print(softmax(a))
+# print(softmax(b))
 
 
 #########################################################################################################
@@ -384,3 +389,83 @@ print(softmax(a))
 # label = Tensor([1,0,2])
 
 # print(CategoricalCrossEntropy(preds, label))
+
+#####################################################################################################################
+
+# a= Tensor([[1,2,3],[1,2,3],[1,2,3],[1,2,3]])
+# b= Tensor([1,1,1])
+
+# print(a.__add__(b))
+
+# yp= np.array([9, 4, 4, 8, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 8, 9, 4, 4, 4, 4, 4, 8,
+#        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 4, 9, 4, 4, 8, 4, 9,
+#        4, 4, 4, 4, 6, 4, 9, 4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 4, 4])
+
+# label= np.array([4, 0, 0, 1, 7, 3, 6, 8, 4, 1, 6, 0, 0, 2, 1, 1, 5, 5, 8, 0, 5, 9,
+#        6, 4, 5, 9, 2, 7, 7, 8, 2, 3, 9, 4, 3, 9, 1, 7, 7, 2, 4, 1, 3, 5,
+#        5, 6, 4, 4, 2, 6, 6, 7, 5, 4, 7, 0, 9, 6, 9, 2, 1, 4, 6, 3])
+
+
+# print(np.sum(yp==label))
+
+
+# a= np.array([0.09984804, 0.10061626, 0.10487659, 0.10884891, 0.08314399,
+#        0.09931026, 0.0912681 , 0.10296731, 0.1165465 , 0.09257403])
+
+# print(a.sum())
+
+
+# #################################
+
+# a = Tensor([[1,2,3],[1,1,1],[0.5, 1, 3]])
+# b = Tensor([[2,2,2],[3,3,3],[1, 1, 1]])
+
+# print(a.__mul__(b).sum())
+
+
+
+
+class AvgPool2d():
+    def __init__(self, in_channels, out_channels, kernel_size=(1, 1), stride=(1, 1), padding=(1, 1)) -> None:
+        super()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.kernel_size = kernel_size
+        self.stride = stride
+        self.padding = padding
+
+    def forward(self, x: Tensor) -> Tensor:
+
+        def zero_padding(x, padding_size=(1,1)):
+            data= np.pad(x, padding_size, mode='constant', constant_values=0)
+            return data
+        
+        "TODO: implement forward pass"
+        batch_size, channel_numbers, H, W = x.shape
+        H_out = (H + 2 * self.padding[0] - self.kernel_size[0]) // self.stride[0] + 1
+        W_out = (W + 2 * self.padding[1] - self.kernel_size[1]) // self.stride[1] + 1
+
+        if self.padding is not None or self.padding!=(0,0):
+            batch_data= []
+            for data in x.data:
+                channel_data = []
+                for channel in data:
+                    channel_data.append(zero_padding(channel))
+                batch_data.append(channel_data)
+            data= batch_data
+        else:
+            data= x.data
+
+        output_data = np.zeros((batch_size, channel_numbers, H_out, W_out))
+        for n in range(batch_size):
+            for c in range(channel_numbers):
+                for h in range(H_out):
+                    for w in range(W_out):
+                        output_data[n, c, h, w] = np.mean(data[n, c, h * self.stride[0] + self.padding[0] : h * self.stride[0] + self.padding[0] + self.kernel_size[0],
+                                                        w * self.stride[1] + self.padding[1] : w * self.stride[1] + self.padding[1] + self.kernel_size[1]])
+        
+        return Tensor(output_data, x.requires_grad, x.depends_on)
+    
+    def __str__(self) -> str:
+        return "avg pool 2d - kernel: {}, stride: {}, padding: {}".format(self.kernel_size, self.stride, self.padding)
+    

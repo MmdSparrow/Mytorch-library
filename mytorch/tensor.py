@@ -236,7 +236,7 @@ def _tensor_slice(t: Tensor, idcs) -> Tensor:
 
 def _tensor_neg(t: Tensor) -> Tensor:
     "TODO: tensor negative"
-    data = -t.data
+    data = np.negative(t.data)
     requires_grad = t.requires_grad
     if requires_grad:
         depends_on = [Dependency(t, lambda x: -x)]

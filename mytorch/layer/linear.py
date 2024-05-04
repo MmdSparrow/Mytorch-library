@@ -20,11 +20,10 @@ class Linear(Layer):
     def forward(self, x: Tensor) -> Tensor:
         "TODO: implement forward pass"
         result = x.__matmul__(self.weight)
-        # print(f'bias: {self.bias}')
-        # print(f'result: {result}')
+        # result = x @ self.weight
         if self.need_bias:
-            result.__add__(self.bias)
-        # print(f'result after bias: {result}')
+            result = result.__add__(self.bias)
+            # result = result + self.bias
         return result
 
     def initialize(self):

@@ -14,7 +14,7 @@ def leaky_relu(x: Tensor) -> Tensor:
 
     if req_grad:
         def grad_fn(grad: np.ndarray):
-            return grad * np.where(x._data > 0, grad, ALPHA_CONSTANT * grad)
+            return grad * np.where(x._data > 0, 1, ALPHA_CONSTANT)
 
         depends_on = [Dependency(x, grad_fn)]
     else:

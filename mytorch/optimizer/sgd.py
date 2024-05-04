@@ -1,4 +1,5 @@
 from typing import List
+import numpy as np
 
 from torch import Tensor
 from mytorch.layer import Layer
@@ -16,3 +17,9 @@ class SGD(Optimizer):
                 layer.weight = layer.weight.__sub__(layer.weight.grad.__mul__(Tensor([self.learning_rate])))
             if layer.need_bias and layer.bias is not None and layer.bias.requires_grad:
                 layer.bias = layer.bias.__sub__(layer.bias.grad.__mul__(Tensor([self.learning_rate])))
+
+
+        # for l in self.layers:
+        #     l.weight = l.weight - (self.learning_rate * l.weight.grad)
+        #     if l.need_bias:
+        #         l.bias = l.bias - (self.learning_rate * l.bias.grad)

@@ -13,7 +13,7 @@ def relu(x: Tensor) -> Tensor:
     if req_grad:
         def grad_fn(grad: np.ndarray):
             # use np.where
-            return grad * np.where(x._data > 0, grad, 0)
+            return grad * np.where(x._data > 0, 1, 0)
 
         depends_on = [Dependency(x, grad_fn)]
     else:

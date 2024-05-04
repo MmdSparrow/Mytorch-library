@@ -18,7 +18,7 @@ class DataLoader:
         self.test_addr = test_addr
         self.test = []  # iterate this field for test
 
-    def load(self, train_batch_size:int=500, test_batch_size:int=100):
+    def load(self, train_batch_size:int=500, test_batch_size:int=100, do_normalize=False):
         print("loading train...")
         train_data = []
         for i in range(TRAIN):
@@ -26,7 +26,11 @@ class DataLoader:
             index = (int) ((i%1000) + 1) 
             addr = self.train_addr + '/' + label.__str__() + ' (' + index.__str__() + ')' + '.jpg'
             img = Image.open(addr, mode='r')
-            train_data.append((np.array(img), label))
+            if do_normalize:
+                train_data.append((np.array(img)/255, label))
+            else:
+                train_data.append((np.array(img), label))
+
         
         print("loading test...")
         test_data = []
@@ -35,7 +39,10 @@ class DataLoader:
             index = (int) ((i%100) + 1) 
             addr = self.test_addr + '/' + label.__str__() + ' (' + index.__str__() + ')' + '.jpg'
             img = Image.open(addr, mode='r')
-            test_data.append((np.array(img), label))
+            if do_normalize:
+                test_data.append((np.array(img)/255, label))
+            else:
+                test_data.append((np.array(img), label))
         
         print('processing...')
         shuffle(train_data)

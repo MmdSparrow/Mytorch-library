@@ -263,5 +263,25 @@ base = 10
 # print(CategoricalCrossEntropy(pred, label))
 
 
-Tensor(round(1/self.learning_rate,3))
+# Tensor(round(1/self.learning_rate,3))
 
+
+def flatten(x) -> Tensor:
+    """
+    TODO: implement flatten. 
+    this methods transforms a n dimensional array into a flat array
+    hint: use numpy flatten
+    """
+    print(f'this is x: {x}')
+    return x.flatten()
+
+
+a= Tensor([[[1,3,1],[3,1,2]], [[1,3,1],[3,1,2]]])
+print(a.data)
+
+
+do_zero_padding = np.vectorize(flatten)
+
+# Apply the vectorized function along the rows (axis=1)
+result = np.apply_along_axis(do_zero_padding, axis=0, arr=a.data)
+print(result)

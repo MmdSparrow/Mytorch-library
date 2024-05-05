@@ -26,7 +26,7 @@ class DataLoader:
             index = (int) ((i%1000) + 1) 
             addr = self.train_addr + '/' + label.__str__() + ' (' + index.__str__() + ')' + '.jpg'
             img = Image.open(addr, mode='r')
-            if do_normalize:
+            if do_normalize: # just work for data with max value 255!
                 train_data.append((np.array(img)/255, label))
             else:
                 train_data.append((np.array(img), label))
@@ -39,7 +39,7 @@ class DataLoader:
             index = (int) ((i%100) + 1) 
             addr = self.test_addr + '/' + label.__str__() + ' (' + index.__str__() + ')' + '.jpg'
             img = Image.open(addr, mode='r')
-            if do_normalize:
+            if do_normalize: # just work for data with max value 255!
                 test_data.append((np.array(img)/255, label))
             else:
                 test_data.append((np.array(img), label))

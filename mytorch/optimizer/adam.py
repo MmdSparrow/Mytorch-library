@@ -9,7 +9,6 @@ from mytorch.layer import Linear
 from mytorch.optimizer import Optimizer
 
 
-# TODO: implement Adam optimizer like SGD
 class Adam(Optimizer):
     def __init__(self, layers: list[Linear], learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8, time = 1):
         super().__init__(layers)

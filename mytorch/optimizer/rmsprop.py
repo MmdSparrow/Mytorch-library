@@ -4,7 +4,6 @@ from mytorch.optimizer import Optimizer
 
 import numpy as np
 
-"TODO: (optional) implement RMSprop optimizer"
 class RMSprop(Optimizer):
     def __init__(self, layers, learning_rate=0.001, rho=0.9, epsilon=1e-8):
         super().__init__(layers)

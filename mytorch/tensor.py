@@ -129,7 +129,15 @@ class Tensor:
         res_tensor = ensure_tensor(other)
         self._data[idcs] = res_tensor._data
         self.requires_grad = res_tensor.requires_grad
-        self.depends_on = res_tensor.depends_on
+        # self.depends_on = res_tensor.depends_on
+        if self.requires_grad:
+            def grad_fn(grad: np.ndarray):
+                return grad[idcs]
+            self.depends_on = [Dependency(self, grad_fn)]
+            
+        else:
+            self.depends_on = []
+
 
     def __neg__(self) -> 'Tensor':
         return _tensor_neg(self)

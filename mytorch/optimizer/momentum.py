@@ -2,7 +2,6 @@ from torch import Tensor
 from mytorch.optimizer import Optimizer
 import numpy as np
 
-"TODO: (optional) implement Momentum optimizer"
 class Momentum(Optimizer):
     def __init__(self, layers, learning_rate=0.1, momentum=0.9):
         super().__init__(layers)

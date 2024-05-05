@@ -132,11 +132,14 @@ class Tensor:
         # self.depends_on = res_tensor.depends_on
         if self.requires_grad:
             def grad_fn(grad: np.ndarray):
-                return grad[idcs]
+                # return grad * other.data
+                pass
             self.depends_on = [Dependency(self, grad_fn)]
             
         else:
             self.depends_on = []
+
+        self.depends_on = other.depends_on
 
 
     def __neg__(self) -> 'Tensor':

@@ -1,4 +1,6 @@
+from mytorch import Tensor
 from mytorch.optimizer import Optimizer
+
 
 import numpy as np
 
@@ -10,14 +12,21 @@ class RMSprop(Optimizer):
         self.rho = rho
         self.epsilon = epsilon
         self.accumulators = {}
+        for layer_index, layer in enumerate(self.layers):
+            self.accumulators[(layer_index, "w")] = Tensor(np.zeros_like(layer.weight.data))
+            if layer.need_bias:
+                self.accumulators[(layer_index, "b")] = Tensor(np.zeros_like(layer.bias.data))
 
     def step(self):
-        for l in self.layers:
-            for param_name, param in l.parameters.items():
-                if param_name not in self.accumulators:
-                    self.accumulators[param_name] = np.zeros_like(param.data)
+        layer_index = -1
+        for layer in self.layers:
+            layer_index+=1
+            if layer.weight is not None and layer.weight.requires_grad:
+                self.accumulators[(layer_index, "w")] = self.rho * self.accumulators[(layer_index, "w")] + (1 - self.rho) * (layer.weight.grad ** 2)
+                update = self.learning_rate * layer.weight.grad * (((self.accumulators[(layer_index, "w")]).__pow__(1/2)) + self.epsilon).__pow__(-1)
+                layer.weight = layer.weight - update
 
-                if param.grad is not None:
-                    grad = param.grad.data
-                    self.accumulators[param_name] = self.rho * self.accumulators[param_name] + (1 - self.rho) * grad**2
-                    param.data -= (self.learning_rate * grad) / (np.sqrt(self.accumulators[param_name]) + self.epsilon)
+            if layer.need_bias and layer.bias is not None and layer.bias.requires_grad:
+                self.accumulators[(layer_index, "b")] = self.rho * self.accumulators[(layer_index, "b")] + (1 - self.rho) * (layer.bias.grad ** 2)
+                update = self.learning_rate * layer.bias.grad * (((self.accumulators[(layer_index, "b")]).__pow__(1/2)) + self.epsilon).__pow__(-1)
+                layer.bias = layer.bias - update

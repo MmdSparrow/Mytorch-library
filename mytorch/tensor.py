@@ -133,6 +133,9 @@ class Tensor:
 
     def __neg__(self) -> 'Tensor':
         return _tensor_neg(self)
+    
+    # def __sqrt__(self) -> 'Tensor':
+    #     return _tensor_sqrt(self)
 
     def backward(self, grad: 'Tensor' = None) -> None:
         if grad is None:
@@ -358,3 +361,18 @@ def _matmul(t1: Tensor, t2: Tensor) -> Tensor:
     return Tensor(data,
                   requires_grad,
                   depends_on)
+
+# def _tensor_sqrt(t: Tensor) -> Tensor:
+#     data = np.sqrt(t.data)
+#     req_grad = t.requires_grad
+
+#     if req_grad:
+#         def grad_fn(grad: np.ndarray):
+#             return grad * 1/2 * np.power(t.data, power - 1)
+
+#         depends_on = [Dependency(t, grad_fn)]
+
+#     else:
+#         depends_on = []
+
+#     return Tensor(data=data, requires_grad=req_grad, depends_on=depends_on)

@@ -13,40 +13,25 @@ from mytorch.optimizer import Optimizer
 class Adam(Optimizer):
     def __init__(self, layers: list[Linear], learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8, time = 1):
         super().__init__(layers)
-        self.layers = layers
         self.learning_rate = learning_rate
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
         self.time = time
-        
-    def step(self):
-        # TODO: update weight and biases ( Don't use '-=' and use l.weight = l.weight - ... )
-        def f_adam(x: Tensor) -> Tensor:
-            # initial momentum
-            f_moment = Tensor(np.zeros_like(x.data))
-            s_moment = Tensor(np.zeros_like(x.data))
-            
-            # update w, b momentum
-            f_moment = (f_moment * self.beta1) + (x.grad * (1 - self.beta1))
-            s_moment = (s_moment * self.beta2) + (x.grad * (1 - self.beta2))
+        self.momentums = [np.zeros_like(param) for layer in self.layers for param in layer.parameters()]
+        self.velocities = [np.zeros_like(param) for layer in self.layers for param in layer.parameters()]
 
-            # bias correction
-            f_ub = (f_moment * (1/(1 - (self.beta1**self.time) + self.epsilon)))
-            s_ub = (s_moment * (1/(1 - (self.beta2**self.time) + self.epsilon)))
-            
-            # update w and b
-            a = f_ub * self.learning_rate 
-            b = (s_ub**0.5) + self.epsilon
-            b.data = 1 / b.data
-            update = a*b
-    
-            return update
-            
-        for l in self.layers:
-            l.weight = l.weight - f_adam(l.weight)
-            if l.need_bias:
-                l.bias = l.bias - f_adam(l.bias)
-                
-        # update time step
-        self.time = self.time + 1
+    def step(self):
+        self.time += 1
+        beta1_t = self.beta1 ** self.time
+        beta2_t = self.beta2 ** self.time
+
+        for layer in self.layers:
+            for param_idx, param in enumerate(layer.parameters()):
+                param_grad = layer.grads[param_idx]
+                self.momentums[param_idx] = self.beta1 * self.momentums[param_idx] + (1 - self.beta1) * param_grad
+                self.velocities[param_idx] = self.beta2 * self.velocities[param_idx] + (1 - self.beta2) * (param_grad ** 2)
+                m_hat = self.momentums[param_idx] / (1 - beta1_t)
+                v_hat = self.velocities[param_idx] / (1 - beta2_t)
+                update = self.learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
+                layer.parameters()[param_idx] -= update

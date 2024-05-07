@@ -12,6 +12,7 @@ def softmax(x: Tensor) -> Tensor:
     hint: a/b = a*(b^-1)
     """
     exp = x.exp()
-    denominator = exp.__matmul__(np.ones((exp.shape[-1], 1)))
+    exp = exp.round()
+    denominator = exp.__matmul__(Tensor(np.ones((exp.shape[-1], 1))))
     result = exp.__mul__(denominator.__pow__(-1))
     return result

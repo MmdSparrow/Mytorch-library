@@ -75,7 +75,7 @@ class Tensor:
     def exp(self) -> 'Tensor':
         return _tensor_exp(self)
 
-    def round(self, base=10) -> 'Tensor':
+    def round(self, base=100) -> 'Tensor':
         return _tensor_round(self, base)
     
     def mean(self) -> 'Tensor':
@@ -83,6 +83,9 @@ class Tensor:
     
     def max(self) -> 'Tensor':
         return _tensor_max(self)
+    
+    def replace_zero(self) -> 'Tensor':
+        return _tensor_replace_zero(self)
     
     def __add__(self, other) -> 'Tensor':
         return _add(self, ensure_tensor(other))
@@ -422,7 +425,7 @@ def _tensor_mean(t: Tensor):
 
     if req_grad:
         def grad_fn(grad: np.ndarray):
-            return grad
+            return grad # * 1/(self.kernel_size[0]*self.kernel_size[1])
 
         depends_on = [Dependency(t, grad_fn)]
 
@@ -434,6 +437,23 @@ def _tensor_mean(t: Tensor):
 
 def _tensor_max(t: Tensor):
     data = np.max(t.data)
+    req_grad = t.requires_grad
+
+    if req_grad:
+        def grad_fn(grad: np.ndarray):
+            return grad
+
+        depends_on = [Dependency(t, grad_fn)]
+
+    else:
+        depends_on = []
+
+    return Tensor(data=data, requires_grad=req_grad, depends_on=depends_on)
+
+
+
+def _tensor_replace_zero(t: Tensor):
+    data = np.where(t.data)
     req_grad = t.requires_grad
 
     if req_grad:

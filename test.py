@@ -1,3 +1,4 @@
+import array
 from ast import List
 
 from torch import tensor
@@ -500,6 +501,17 @@ base = 10
 #   0.00000000e+000 5.11105650e-257]], requires_grad=True)
 
 
-data = np.array([1.60130719e-01, 9.93827160e-01, 3.63108206e-04])
-rounded_data = np.round(data, 8)
-print(rounded_data)
+# data = np.array([1.60130719e-01, 9.93827160e-01, 3.63108206e-04])
+# rounded_data = np.round(data, 8)
+# print(rounded_data)
+
+# Create a numpy array
+arr = np.array([0, 5, 0, 10, 0, 15])
+
+# Find the smallest positive number in numpy
+smallest_pos_num = np.finfo(np.float64).tiny
+
+# Replace every 0 with the smallest positive number
+arr[arr == 0] = smallest_pos_num
+
+print(arr)

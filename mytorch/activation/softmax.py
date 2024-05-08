@@ -21,5 +21,5 @@ def softmax(x: Tensor) -> Tensor:
         denominator=denominator.replace_infinity_with_max()
     result = exp.__mul__(denominator.__pow__(-1))
     if np.isinf(result.data).any():
-        result=result.replace_infinity_with_max()
+        result=result.replace_zero_with_min()
     return result

@@ -3,7 +3,8 @@ from mytorch import Tensor
 
 def CategoricalCrossEntropy(preds: Tensor, label: Tensor):
     "TODO: implement Categorical Cross Entropy loss"
-    if np.isnan(preds.data).any() or np.any(preds.data < 0):
+    preds.replace_zero_with_min()
+    if np.isnan(preds.data).any() or np.any(preds.data <= 0):
         raise ValueError("invalid value in data!")
     label_array= np.zeros_like(preds.data)
     for i in range(preds.shape[0]):

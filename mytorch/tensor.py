@@ -84,8 +84,14 @@ class Tensor:
     def max(self) -> 'Tensor':
         return _tensor_max(self)
     
-    def replace_zero(self) -> 'Tensor':
-        return _tensor_replace_zero(self)
+    def replace_zero_with_min(self) -> 'Tensor':
+        return _tensor_replace_zero_with_min(self)
+    
+    def replace_infinity_with_max(self) -> 'Tensor':
+        return _tensor_replace_infinity_with_max(self)
+
+    def zero_padding(self, padding_size=(1,1)) -> 'Tensor':
+        return _tensor_zero_padding(self, padding_size)
     
     def __add__(self, other) -> 'Tensor':
         return _add(self, ensure_tensor(other))
@@ -452,8 +458,54 @@ def _tensor_max(t: Tensor):
 
 
 
-def _tensor_replace_zero(t: Tensor):
-    data = np.where(t.data)
+def _tensor_replace_zero_with_min(t: Tensor):
+    min_positive = (np.min(t.data[t.data > 0]))/10
+    data = np.where(t.data == 0, min_positive, t.data)
+
+    req_grad = t.requires_grad
+
+    if req_grad:
+        def grad_fn(grad: np.ndarray):
+            return grad
+
+        depends_on = [Dependency(t, grad_fn)]
+
+    else:
+        depends_on = []
+
+    return Tensor(data=data, requires_grad=req_grad, depends_on=depends_on)
+
+
+
+def _tensor_replace_infinity_with_max(t: Tensor):
+    LARGE_NUMBER = np.finfo(np.float64).max
+    data = np.nan_to_num(t.data, nan=0, posinf=LARGE_NUMBER, neginf=-LARGE_NUMBER)
+    req_grad = t.requires_grad
+
+    if req_grad:
+        def grad_fn(grad: np.ndarray):
+            return grad
+
+        depends_on = [Dependency(t, grad_fn)]
+
+    else:
+        depends_on = []
+
+    return Tensor(data=data, requires_grad=req_grad, depends_on=depends_on)
+
+def _tensor_zero_padding(t: Tensor, padding_size):
+    
+    def zero_padding(x, padding_size=(1,1)):
+        data= np.pad(x, padding_size, mode='constant', constant_values=0)
+        return data
+    
+    batch_data= []
+    for batch in t.data:
+        channel_data = []
+        for channel in batch:
+            channel_data.append(zero_padding(channel, padding_size))
+        batch_data.append(channel_data)
+    data= batch_data
     req_grad = t.requires_grad
 
     if req_grad:

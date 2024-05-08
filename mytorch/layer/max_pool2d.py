@@ -17,25 +17,18 @@ class MaxPool2d(Layer):
         W_out = (W + 2 * self.padding[1] - self.kernel_size[1]) // self.stride[1] + 1
 
         if self.padding is not None and self.padding!=(0,0):
-            batch_data= []
-            for data in x.data:
-                channel_data = []
-                for channel in data:
-                    channel_data.append(zero_padding(channel))
-                batch_data.append(channel_data)
-            data= batch_data
-        else:
-            data= x.data
+            x=x.zero_padding(self.padding)
 
-        output_data = np.zeros((batch_size, channel_numbers, H_out, W_out))
+        output = Tensor(np.zeros((batch_size, channel_numbers, H_out, W_out)))
+
         for n in range(batch_size):
             for c in range(channel_numbers):
                 for h in range(H_out):
                     for w in range(W_out):
-                        output_data[n, c, h, w] = np.max(data[n, c, h * self.stride[0] + self.padding[0] : h * self.stride[0] + self.padding[0] + self.kernel_size[0],
-                                                        w * self.stride[1] + self.padding[1] : w * self.stride[1] + self.padding[1] + self.kernel_size[1]])
+                        output[n, c, h, w] = (x[n, c, h * self.stride[0] + self.padding[0] : h * self.stride[0] + self.padding[0] + self.kernel_size[0],
+                                                        w * self.stride[1] + self.padding[1] : w * self.stride[1] + self.padding[1] + self.kernel_size[1]]).max()
         
-        return Tensor(output_data, x.requires_grad, x.depends_on)
+        return output
     
     def __str__(self) -> str:
         return "max pool 2d - kernel: {}, stride: {}, padding: {}".format(self.kernel_size, self.stride, self.padding)

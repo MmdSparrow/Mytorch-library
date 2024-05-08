@@ -11,10 +11,8 @@ def softmax(x: Tensor) -> Tensor:
         2. using matrix mul to do it :) (recommended)
     hint: a/b = a*(b^-1)
     """
-    # x.round(70)
     exp = x.exp()
     if np.isinf(exp.data).any():
-        # raise ValueError("overflow in softmax!")
         exp=exp.replace_infinity_with_max()
     denominator = exp.__matmul__(Tensor(np.ones((exp.shape[-1], 1))))
     if np.isinf(denominator.data).any():
@@ -23,3 +21,12 @@ def softmax(x: Tensor) -> Tensor:
     if np.isinf(result.data).any():
         result=result.replace_zero_with_min()
     return result
+
+    # M=20
+    # reduce_tensor = Tensor(np.full_like(x, M)).exp()
+    # exp = x.exp()
+    # denominator = exp.__matmul__(Tensor(np.ones((exp.shape[-1], 1))))
+    # denominator=denominator.__matmul__(reduce_tensor)
+    # denominator=exp.__matmul__(reduce_tensor)
+    # result = exp.__mul__(denominator.__pow__(-1))
+    # return result
